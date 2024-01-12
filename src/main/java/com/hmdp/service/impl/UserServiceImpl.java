@@ -39,6 +39,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    String token;
+
     @Override
     public Result sendCode(String phone, HttpSession session) {
         //1•校验手机号
@@ -89,7 +91,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 7.保存用户信息到 redis中
 
         // 7.1.随机生成token，作为登录令牌
-        String token = UUID.randomUUID().toString(true);
+        token = UUID.randomUUID().toString(true);
         // 7.2.将User对象转为HashMap存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
         Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(),
@@ -107,6 +109,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         //8.返回token
         return Result.ok(token);
+    }
+
+    @Override
+    public Result logout() {
+        stringRedisTemplate.delete(LOGIN_USER_KEY + token);
+        //返回
+        return Result.ok();
+
     }
 
     private User createUserWithPhone(String phone) {
