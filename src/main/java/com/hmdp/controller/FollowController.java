@@ -12,8 +12,8 @@ import javax.annotation.Resource;
  *  前端控制器
  * </p>
  *
- * @author 虎哥
- * @since 2021-12-22
+ * @author M1sa
+ * M1sa
  */
 @RestController
 @RequestMapping("/follow")
@@ -30,5 +30,12 @@ public class FollowController {
     public Result isFollow(@PathVariable("id") Long followUserId) {
         return followService.isFollow(followUserId);
     }
+
+    //共同关注
+    @GetMapping("/common/{id}")
+    public Result commonFollow(@PathVariable("id") Long id) {
+        return followService.followCommons(id);
+    }
+
 
 }
