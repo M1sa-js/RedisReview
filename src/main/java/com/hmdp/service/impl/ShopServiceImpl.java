@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.hmdp.utils.RedisConstants.*;
@@ -31,10 +33,14 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    private static final ExecutorService CACHE_REBUILD_EXECUTOR = Executors.newFixedThreadPool(10);
+
     @Override
     public Result queryById(Long id) {
         // 缓存穿透
         //shop = queryWithPassThrough(id);
+        // Shop shop = cacheClient
+        //         .queryWithMutex(CACHE_SHOP_KEY, id, Shop.class, this::getById, CACHE_SHOP_TTL, TimeUnit.MINUTES);
 
         //互斥锁解决缓存击穿
         Shop shop = queryWithMutex(id);
@@ -47,6 +53,8 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         return Result.ok(shop);
 
     }
+
+    //缓存穿透
     public Shop queryWithMutex(Long id)  {
         String key = CACHE_SHOP_KEY + id;
         // 1、从redis中查询商铺缓存
@@ -95,6 +103,8 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         }
         return shop;
     }
+
+    //缓存击穿
     public Shop queryWithPassThrough(long id){
         String key  = CACHE_SHOP_KEY  + id;
         //1.从redis 查询商铺缓存
