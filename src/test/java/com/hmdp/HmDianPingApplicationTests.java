@@ -3,7 +3,10 @@ package com.hmdp;
 import com.hmdp.entity.Shop;
 import com.hmdp.service.IShopService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -15,13 +18,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.hmdp.utils.RedisConstants.SHOP_GEO_KEY;
-
+@MapperScan("com.hmdp.mapper")
 @SpringBootTest
-class HmDianPingApplicationTests {
+public class HmDianPingApplicationTests {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private IShopService shopService;
+
+
+
+
     @Test
     void loadShopData() {
         // 1.查询店铺信息
@@ -48,14 +55,6 @@ class HmDianPingApplicationTests {
         }
     }
 
-    /*
-    // nums.length >= 3
-    // 数组中存在满足如下关系的3个下标 i,j,k 其中 i < j < k，且 nums[i] < nums[j] > nums[k]
-    // 返回在所有满足这种关系的i j k中，三者之和最小值
-        public int method(int[] nums) {
-
-    }
-    */
 
 
 
