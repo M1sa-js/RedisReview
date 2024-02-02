@@ -13,6 +13,11 @@ local stockKey = 'seckill:stock:' .. voucherId
 local orderKey = 'seckill:order:' .. voucherId
 
 -- 3.脚本业务
+-- 3.0 判断stockKey是否存在
+if(redis.call('exists', stockKey) == 0) then
+    -- 不存在，返回-1
+    return 1
+end
 -- 3.1.判断库存是否充足 get stockKey
 if(tonumber(redis.call('get', stockKey)) <= 0) then
     -- 3.2.库存不足，返回1

@@ -51,7 +51,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private static final DefaultRedisScript<Long> SECKILL_SCRIPT;
     static {
         SECKILL_SCRIPT = new DefaultRedisScript<>();
-        SECKILL_SCRIPT.setLocation(new ClassPathResource("classpath:seckill.lua"));
+        SECKILL_SCRIPT.setLocation(new ClassPathResource("seckill.lua"));
         SECKILL_SCRIPT.setResultType(Long.class);
     }
 
@@ -181,6 +181,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
 
     @Transactional
     public void createVoucherOrder(VoucherOrder voucherOrder) {
+        //5 一人一单
         Long userId = voucherOrder.getUserId();
 
         // 5.1.查询订单
@@ -195,7 +196,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         // 6.扣减库存
         boolean success = seckillVoucherService.update()
                 .setSql("stock = stock - 1") // set stock = stock - 1
-                .eq("voucher_id", voucherOrder).gt("stock", 0) // where id = ? and stock > 0
+                .eq("voucher_id", voucherOrder.getVoucherId()).gt("stock", 0) // where id = ? and stock > 0
                 .update();
         if (!success) {
             // 扣减失败
@@ -203,10 +204,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
             return ;
         }
 
-
         save(voucherOrder);
-
-
 
     }
 }
